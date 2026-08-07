@@ -46,9 +46,7 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://openrouter.ai/docs",
     models: [
-      { id: "meta-llama/llama-3.3-70b-instruct:free", label: "Llama 3.3 70B (free)", purposes: ["general", "reasoning"], rank: 1, contextTokens: 65000 },
-      { id: "google/gemini-2.0-flash-exp:free", label: "Gemini 2.0 Flash (free)", purposes: ["general", "fast", "vision"], rank: 2, contextTokens: 1000000, vision: true },
-      { id: "mistralai/mistral-7b-instruct:free", label: "Mistral 7B (free)", purposes: ["fast", "coding"], rank: 3, contextTokens: 32000 },
+      { id: "openrouter/free", label: "OpenRouter Free", purposes: ["general", "reasoning", "coding"], rank: 1, contextTokens: 128000 },
     ],
   },
   {
@@ -96,8 +94,8 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://inference-docs.cerebras.ai/",
     models: [
-      { id: "llama-3.3-70b", label: "Llama 3.3 70B (fastest)", purposes: ["fast", "general"], rank: 1, contextTokens: 128000 },
-      { id: "llama3.1-8b", label: "Llama 3.1 8B", purposes: ["fast"], rank: 2, contextTokens: 128000 },
+      { id: "gpt-oss-120b", label: "GPT-OSS 120B", purposes: ["general", "reasoning", "coding"], rank: 1, contextTokens: 128000 },
+      { id: "gemma-4-31b", label: "Gemma 4 31B", purposes: ["fast", "general"], rank: 2, contextTokens: 128000 },
     ],
   },
   {
