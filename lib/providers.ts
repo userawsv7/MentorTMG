@@ -46,9 +46,10 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://openrouter.ai/docs",
     models: [
-      { id: "meta-llama/llama-3.3-70b-instruct:free", label: "Llama 3.3 70B (free)", purposes: ["general", "reasoning"], rank: 1, contextTokens: 65000 },
-      { id: "google/gemini-2.0-flash-exp:free", label: "Gemini 2.0 Flash (free)", purposes: ["general", "fast", "vision"], rank: 2, contextTokens: 1000000, vision: true },
+      { id: "meta-llama/llama-3.1-8b-instruct:free", label: "Llama 3.1 8B (free)", purposes: ["general", "fast"], rank: 1, contextTokens: 128000 },
+      { id: "google/gemini-flash-1.5:free", label: "Gemini Flash 1.5 (free)", purposes: ["general", "fast", "vision"], rank: 2, contextTokens: 1000000, vision: true },
       { id: "mistralai/mistral-7b-instruct:free", label: "Mistral 7B (free)", purposes: ["fast", "coding"], rank: 3, contextTokens: 32000 },
+      { id: "microsoft/phi-3-mini-128k-instruct:free", label: "Phi-3 Mini (free)", purposes: ["fast"], rank: 4, contextTokens: 128000 },
     ],
   },
   {
@@ -145,8 +146,10 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "replicate",
     docsUrl: "https://replicate.com/docs",
     models: [
-      { id: "meta/meta-llama-3-70b-instruct", label: "Llama 3 70B", purposes: ["general"], rank: 1 },
-      { id: "black-forest-labs/flux-schnell", label: "FLUX Schnell (image gen)", purposes: ["general"], rank: 2, imageGen: true },
+      { id: "meta/meta-llama-3-8b-instruct", label: "Llama 3 8B", purposes: ["general", "fast"], rank: 1 },
+      { id: "meta/meta-llama-3-70b-instruct", label: "Llama 3 70B", purposes: ["general", "reasoning"], rank: 2 },
+      { id: "mistralai/mistral-7b-instruct-v0.2", label: "Mistral 7B", purposes: ["fast", "coding"], rank: 3 },
+      { id: "black-forest-labs/flux-schnell", label: "FLUX Schnell (image gen)", purposes: ["general"], rank: 4, imageGen: true },
     ],
   },
   {
