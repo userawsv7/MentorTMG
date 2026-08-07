@@ -402,10 +402,12 @@ export async function routeChat(opts: {
 
         const last = attempts[attempts.length - 1];
 
-        // Check for rate limit, server error, or quota issues
+        // Check for rate limit, server error, quota issues, or model unavailable
         const isRetryableError = result.errorInfo?.issueType === "rate_limit" ||
                                  result.errorInfo?.issueType === "provider_issue" ||
-                                 (result.errorInfo?.message?.toLowerCase().includes("quota") ?? false);
+                                 result.errorInfo?.issueType === "model_unavailable" ||
+                                 (result.errorInfo?.message?.toLowerCase().includes("quota") ?? false) ||
+                                 (result.errorInfo?.message?.toLowerCase().includes("model") ?? false);
 
         if (result.ok) {
           last.status = "ok";
