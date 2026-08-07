@@ -94,8 +94,12 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://inference-docs.cerebras.ai/",
     models: [
-      { id: "gpt-oss-120b", label: "GPT-OSS 120B", purposes: ["general", "reasoning", "coding"], rank: 1, contextTokens: 128000 },
-      { id: "gemma-4-31b", label: "Gemma 4 31B", purposes: ["fast", "general"], rank: 2, contextTokens: 128000 },
+      { id: "llama-4-scout-17b-16e-instruct", label: "Llama 4 Scout 17B", purposes: ["fast", "general"], rank: 1, contextTokens: 128000 },
+      { id: "llama-3.3-70b", label: "Llama 3.3 70B", purposes: ["reasoning", "general"], rank: 2, contextTokens: 128000 },
+      { id: "gpt-oss-120b", label: "GPT-OSS 120B", purposes: ["reasoning", "coding", "general"], rank: 3, contextTokens: 128000 },
+      { id: "zai-glm-4.7", label: "ZAI GLM 4.7", purposes: ["coding", "general"], rank: 4, contextTokens: 128000 },
+      { id: "gemma-4-31b-it", label: "Gemma 4 31B IT", purposes: ["fast", "general"], rank: 5, contextTokens: 128000 },
+      { id: "qwen-3-32b", label: "Qwen 3 32B", purposes: ["coding", "reasoning", "general"], rank: 6, contextTokens: 128000 },
     ],
   },
   {

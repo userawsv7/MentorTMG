@@ -366,43 +366,117 @@ export async function routeChat(opts: {
     };
   }
 
+  // Group chain links by provider for Cerebras fallback logic
+  const providerGroups = new Map<string, ChainLink[]>();
   for (const link of chain) {
-    const apiKey = keys[link.providerKey];
-    if (!apiKey) {
-      attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "skipped", error: "No key entered." });
-      continue;
+    if (!providerGroups.has(link.providerKey)) {
+      providerGroups.set(link.providerKey, []);
+    }
+    providerGroups.get(link.providerKey)!.push(link);
+  }
+
+  // Sort providers so Cerebras comes first in its group
+  const sortedProviders = Array.from(providerGroups.keys()).sort((a, b) => {
+    if (a === "cerebras") return -1;
+    if (b === "cerebras") return 1;
+    return 0;
+  });
+
+  for (const providerKey of sortedProviders) {
+    const links = providerGroups.get(providerKey)!;
+
+    // For Cerebras, try all models in sequence before falling back
+    if (providerKey === "cerebras") {
+      for (const link of links) {
+        const apiKey = keys[link.providerKey];
+        if (!apiKey) {
+          attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "skipped", error: "No key entered." });
+          continue;
+        }
+
+        attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "trying" });
+
+        let result: CallResult;
+        const isImageGen = !!link.model.imageGen;
+        result = await callOpenAICompatible(link.provider, link.providerKey, apiKey, link.model.id, messages, !!link.model.vision);
+
+        const last = attempts[attempts.length - 1];
+
+        // Check for rate limit, server error, or quota issues
+        const isRetryableError = result.errorInfo?.issueType === "rate_limit" ||
+                                 result.errorInfo?.issueType === "provider_issue" ||
+                                 (result.errorInfo?.message?.toLowerCase().includes("quota") ?? false);
+
+        if (result.ok) {
+          last.status = "ok";
+          return {
+            content: result.content ?? "",
+            imageUrl: result.imageUrl,
+            provider: link.providerKey,
+            providerLabel: link.provider.label,
+            model: link.model.id,
+            attempts,
+            usage: result.usage,
+          } as RouteResult;
+        } else if (isRetryableError) {
+          // Log the failure and continue to next Cerebras model
+          last.status = "error";
+          last.error = result.errorInfo?.message ?? "Request failed.";
+          last.fixes = result.errorInfo?.fixes;
+          last.docsUrl = link.provider.docsUrl;
+          last.issueType = result.errorInfo?.issueType;
+          continue;
+        } else {
+          last.status = "error";
+          last.error = result.errorInfo?.message ?? "Request failed.";
+          last.fixes = result.errorInfo?.fixes;
+          last.docsUrl = link.provider.docsUrl;
+          last.issueType = result.errorInfo?.issueType;
+          break; // Non-retryable error, move to next provider
+        }
+      }
+      continue; // Move to next provider after trying all Cerebras models
     }
 
-    attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "trying" });
+    // Standard handling for non-Cerebras providers
+    for (const link of links) {
+      const apiKey = keys[link.providerKey];
+      if (!apiKey) {
+        attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "skipped", error: "No key entered." });
+        continue;
+      }
 
-    let result: CallResult;
-    const isImageGen = !!link.model.imageGen;
-    if (link.provider.adapter === "cloudflare") {
-      result = await callCloudflare(link.provider, link.providerKey, apiKey, link.model.id, messages, isImageGen, extra?.[link.providerKey]?.accountId);
-    } else if (link.provider.adapter === "replicate") {
-      result = await callReplicate(link.provider, link.providerKey, apiKey, link.model.id, messages, isImageGen);
-    } else {
-      result = await callOpenAICompatible(link.provider, link.providerKey, apiKey, link.model.id, messages, !!link.model.vision);
-    }
+      attempts.push({ provider: link.providerKey, providerLabel: link.provider.label, model: link.model.id, status: "trying" });
 
-    const last = attempts[attempts.length - 1];
-    if (result.ok) {
-      last.status = "ok";
-      return {
-        content: result.content ?? "",
-        imageUrl: result.imageUrl,
-        provider: link.providerKey,
-        providerLabel: link.provider.label,
-        model: link.model.id,
-        attempts,
-        usage: result.usage,
-      } as RouteResult;
+      let result: CallResult;
+      const isImageGen = !!link.model.imageGen;
+      if (link.provider.adapter === "cloudflare") {
+        result = await callCloudflare(link.provider, link.providerKey, apiKey, link.model.id, messages, isImageGen, extra?.[link.providerKey]?.accountId);
+      } else if (link.provider.adapter === "replicate") {
+        result = await callReplicate(link.provider, link.providerKey, apiKey, link.model.id, messages, isImageGen);
+      } else {
+        result = await callOpenAICompatible(link.provider, link.providerKey, apiKey, link.model.id, messages, !!link.model.vision);
+      }
+
+      const last = attempts[attempts.length - 1];
+      if (result.ok) {
+        last.status = "ok";
+        return {
+          content: result.content ?? "",
+          imageUrl: result.imageUrl,
+          provider: link.providerKey,
+          providerLabel: link.provider.label,
+          model: link.model.id,
+          attempts,
+          usage: result.usage,
+        } as RouteResult;
+      }
+      last.status = "error";
+      last.error = result.errorInfo?.message ?? "Request failed.";
+      last.fixes = result.errorInfo?.fixes;
+      last.docsUrl = link.provider.docsUrl;
+      last.issueType = result.errorInfo?.issueType;
     }
-    last.status = "error";
-    last.error = result.errorInfo?.message ?? "Request failed.";
-    last.fixes = result.errorInfo?.fixes;
-    last.docsUrl = link.provider.docsUrl;
-    last.issueType = result.errorInfo?.issueType;
   }
 
   return {
