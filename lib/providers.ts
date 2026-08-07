@@ -120,9 +120,10 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://docs.fireworks.ai/",
     models: [
-      { id: "accounts/fireworks/models/llama-v3p3-70b-instruct", label: "Llama 3.3 70B", purposes: ["general", "reasoning"], rank: 1, contextTokens: 128000 },
-      { id: "accounts/fireworks/models/llama-v3p1-8b-instruct", label: "Llama 3.1 8B", purposes: ["fast", "general"], rank: 2, contextTokens: 128000 },
-      { id: "accounts/fireworks/models/mixtral-8x7b-instruct", label: "Mixtral 8x7B", purposes: ["coding", "general"], rank: 3, contextTokens: 32000 },
+      { id: "accounts/fireworks/models/llama-v3p1-405b-instruct", label: "Llama 3.1 405B", purposes: ["general", "reasoning"], rank: 1, contextTokens: 128000 },
+      { id: "accounts/fireworks/models/llama-v3p1-70b-instruct", label: "Llama 3.1 70B", purposes: ["general", "reasoning"], rank: 2, contextTokens: 128000 },
+      { id: "accounts/fireworks/models/llama-v3p1-8b-instruct", label: "Llama 3.1 8B", purposes: ["fast", "general"], rank: 3, contextTokens: 128000 },
+      { id: "accounts/fireworks/models/mixtral-8x7b-instruct", label: "Mixtral 8x7B", purposes: ["coding", "general"], rank: 4, contextTokens: 32000 },
     ],
   },
   {
