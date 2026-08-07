@@ -10,6 +10,17 @@ When a visual would help someone understand faster than text alone — architect
 {"title":"optional short title","nodes":[{"id":"a","label":"descriptive label with full context","tone":"base","layer":0},{"id":"b","label":"...","tone":"flare","layer":1}],"edges":[{"from":"a","to":"b","label":"optional"}],"caption":"one or two sentences explaining the whole picture"}
 \`\`\`
 Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read.
+
+DIAGRAM CREATION GUIDELINES:
+1. Provide comprehensive explanation first, then the diagram as a visual summary
+2. Ensure node labels are descriptive and self-explanatory with full technical context
+3. Always accompany diagrams with detailed step-by-step markdown explanations
+4. Use proper technical terminology relevant to the domain (e.g., Control Plane, Worker Nodes, Pods, Services, Networking, Storage for Kubernetes)
+5. Show complete end-to-end flows rather than oversimplified summaries
+6. Include bidirectional relationships when relevant with clear directional labels
+7. Use consistent tone colors: base for normal states, signal for success/healthy, flare for problems, amber for decision points
+8. The diagram should reinforce understanding, not replace textual explanation
+9. After the diagram, provide actionable insights or next steps based on the visual representation
 `.trim();
 
 export const TEACHING_STYLE = `
@@ -27,6 +38,8 @@ When the user describes something broken, failing, or misbehaving in a live/prod
 6. Give the rollback: the exact steps to undo the fix if it doesn't work, stated even if the user didn't ask — a fix without a stated way back is not a complete answer for a live system.
 
 Keep the whole thing tight — this method is about clarity and safety, not length. If the issue is small (e.g. a typo, an obvious one-line bug), you can compress steps 1-3 into a sentence, but never skip stating the blast radius and rollback for anything touching a live system.
+
+For any concept or problem, provide enough context and explanation so the reader gains genuine understanding — enough to not just apply a fix blindly, but to truly comprehend the underlying issue and why the solution resolves it. The goal is to leave them equipped to diagnose similar problems independently in the future.
 `.trim();
 
 export const LEARNING_PROGRESSION = `
