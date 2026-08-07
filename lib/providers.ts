@@ -85,8 +85,10 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://deepinfra.com/docs",
     models: [
-      { id: "meta-llama/Meta-Llama-3.1-70B-Instruct", label: "Llama 3.1 70B", purposes: ["general", "reasoning"], rank: 1, contextTokens: 128000 },
-      { id: "mistralai/Mistral-7B-Instruct-v0.3", label: "Mistral 7B", purposes: ["fast"], rank: 2, contextTokens: 32000 },
+      { id: "meta-llama/Meta-Llama-3.1-8B-Instruct", label: "Llama 3.1 8B", purposes: ["general", "fast"], rank: 1, contextTokens: 128000 },
+      { id: "meta-llama/Meta-Llama-3.1-70B-Instruct", label: "Llama 3.1 70B", purposes: ["general", "reasoning"], rank: 2, contextTokens: 128000 },
+      { id: "mistralai/Mistral-7B-Instruct-v0.3", label: "Mistral 7B", purposes: ["fast", "coding"], rank: 3, contextTokens: 32000 },
+      { id: "Qwen/Qwen2.5-7B-Instruct", label: "Qwen2.5 7B", purposes: ["general", "coding"], rank: 4, contextTokens: 32768 },
     ],
   },
   {
@@ -97,8 +99,8 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://inference-docs.cerebras.ai/",
     models: [
-      { id: "llama-3.3-70b", label: "Llama 3.3 70B (fastest)", purposes: ["fast", "general"], rank: 1, contextTokens: 128000 },
-      { id: "llama3.1-8b", label: "Llama 3.1 8B", purposes: ["fast"], rank: 2, contextTokens: 128000 },
+      { id: "llama3.1-8b", label: "Llama 3.1 8B", purposes: ["fast", "general"], rank: 1, contextTokens: 8192 },
+      { id: "llama-3.3-70b", label: "Llama 3.3 70B (fastest)", purposes: ["fast", "general", "reasoning"], rank: 2, contextTokens: 8192 },
     ],
   },
   {
