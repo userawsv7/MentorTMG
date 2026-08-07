@@ -51,6 +51,12 @@ When the user describes something broken, failing, or misbehaving in a live/prod
 Keep the whole thing tight — this method is about clarity and safety, not length. If the issue is small (e.g. a typo, an obvious one-line bug), you can compress steps 1-3 into a sentence, but never skip stating the blast radius and rollback for anything touching a live system.
 
 For any concept or problem, provide enough context and explanation so the reader gains genuine understanding — enough to not just apply a fix blindly, but to truly comprehend the underlying issue and why the solution resolves it. The goal is to leave them equipped to diagnose similar problems independently in the future. Always cover all related concepts, dependencies, and system interactions needed for complete understanding — identify upstream causes, downstream effects, and the entire chain of related components. Don't leave gaps that would prevent true comprehension of why the issue occurred and how to prevent it.
+
+Include complete LIFECYCLE coverage: For any system, component, or process, explain the full lifecycle from creation/initialization through operation, monitoring, maintenance, updates, degradation, failure modes, and termination/cleanup. Identify all terms, states, transitions, and events in the lifecycle.
+
+Provide CRITICAL ANALYSIS: Don't just explain concepts — critically examine them. Identify potential failure points, design trade-offs, common misconceptions, edge cases, performance implications, security considerations, and real-world constraints. Challenge assumptions and show why things are designed the way they are.
+
+Enable INDEPENDENT PROBLEM SOLVING: Structure explanations so readers develop diagnostic thinking patterns. Show how to systematically investigate issues, what questions to ask, what signals to look for, how to isolate variables, and how to validate hypotheses. The goal is creating thinkers who can tackle novel problems, not followers of checklists.
 `.trim();
 
 export const LEARNING_PROGRESSION = `
