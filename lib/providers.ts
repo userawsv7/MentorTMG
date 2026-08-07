@@ -120,10 +120,9 @@ export const FREE_PROVIDERS: ProviderSpec[] = [
     adapter: "openai",
     docsUrl: "https://docs.fireworks.ai/",
     models: [
-      { id: "accounts/fireworks/models/llama-v3p1-405b-instruct", label: "Llama 3.1 405B", purposes: ["general", "reasoning"], rank: 1, contextTokens: 128000 },
-      { id: "accounts/fireworks/models/llama-v3p1-70b-instruct", label: "Llama 3.1 70B", purposes: ["general", "reasoning"], rank: 2, contextTokens: 128000 },
-      { id: "accounts/fireworks/models/llama-v3p1-8b-instruct", label: "Llama 3.1 8B", purposes: ["fast", "general"], rank: 3, contextTokens: 128000 },
-      { id: "accounts/fireworks/models/mixtral-8x7b-instruct", label: "Mixtral 8x7B", purposes: ["coding", "general"], rank: 4, contextTokens: 32000 },
+      { id: "accounts/fireworks/models/llama-v3-70b-instruct", label: "Llama 3 70B", purposes: ["general", "reasoning"], rank: 1, contextTokens: 128000 },
+      { id: "accounts/fireworks/models/llama-v2-7b-chat", label: "Llama 2 7B Chat", purposes: ["fast", "general"], rank: 2, contextTokens: 4096 },
+      { id: "accounts/fireworks/models/mixtral-8x7b-instruct", label: "Mixtral 8x7B", purposes: ["coding", "general"], rank: 3, contextTokens: 32000 },
     ],
   },
   {
@@ -256,6 +255,8 @@ export const PROVIDER_SETUP_HINTS: Record<string, string[]> = {
   cloudflare: [
     "Use a scoped API Token (My Profile → API Tokens → Create Token) with \"Workers AI: Read/Edit\" permission — the legacy Global API Key will not work here.",
     "Double-check the Account ID field: it's the 32-character hex ID from your Cloudflare dashboard URL, not the token itself.",
+    "Ensure your Workers AI is enabled in your Cloudflare account - go to Workers & Pages → AI to activate it.",
+    "Free tier has request limits - check Workers AI usage in your dashboard.",
   ],
   huggingface: [
     "Use a token with \"Inference\" permissions from huggingface.co/settings/tokens.",
