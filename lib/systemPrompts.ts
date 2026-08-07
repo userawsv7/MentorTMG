@@ -11,6 +11,17 @@ When a visual would help someone understand faster than text alone — architect
 \`\`\`
 Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read.
 
+DIAGRAM QUALITY REQUIREMENTS:
+- Create CLEAN, READABLE diagrams that are self-explanatory — one should be able to understand the concept just by looking at the visual
+- NEVER produce jumbled, overlapping, or crowded node arrangements
+- Group related nodes in the SAME layer so they stack vertically rather than spreading horizontally
+- Limit to MAXIMUM 3-4 columns (layers 0-3) to prevent horizontal sprawl and overlapping
+- Use descriptive, clear node labels that are fully readable without truncation
+- Ensure edges don't cross unnecessarily and have clear, concise labels
+- Design for visual clarity first — the diagram should teach at a glance
+- Nodes in the same layer will render as a vertical column, making multi-row layouts natural and clean
+- The final diagram must look professional with proper spacing and no CSS/rendering issues
+
 DIAGRAM CREATION GUIDELINES:
 1. Provide comprehensive explanation first, then the diagram as a visual summary
 2. Ensure node labels are descriptive and self-explanatory with full technical context
