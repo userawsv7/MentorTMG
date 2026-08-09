@@ -5,10 +5,29 @@
  */
 
 export const DIAGRAM_INSTRUCTIONS = `
-When a visual would help someone understand faster than text alone — architecture, a request/data flow, a comparison, a sequence of steps, or a troubleshooting diagnosis — include a fenced code block with the language "diagram" containing ONLY valid JSON in this exact shape, no comments, no trailing commas:
+When a visual would help someone understand faster than text alone — architecture, a request/data flow, a comparison, a sequence of steps, or a troubleshooting diagnosis — include a fenced code block with the language "diagram" containing ONLY valid JSON.
+
+CRITICAL JSON GENERATION RULES - THESE ARE MANDATORY:
+1. ALL strings must be COMPLETE - never truncate labels, titles, tone values, or any other strings
+2. ALL property names and string values must use DOUBLE QUOTES (never single quotes)
+3. NO trailing commas after the last item in objects or arrays
+4. NO comments of any kind inside the JSON block
+5. Tone values MUST be exactly one of these four strings: "base", "signal", "flare", "amber"
+6. Layer values MUST be non-negative integers only: 0, 1, 2, 3, 4...
+7. Every node MUST have exactly these four properties: id, label, tone, layer
+8. Every edge MUST have at least: from, to (label is optional but must be complete if present)
+
+VALID COMPLETE EXAMPLE - STUDY THIS FORMAT:
 \`\`\`diagram
-{"title":"optional short title","nodes":[{"id":"a","label":"short label (<=6 words)","tone":"base","layer":0},{"id":"b","label":"...","tone":"flare","layer":1}],"edges":[{"from":"a","to":"b","label":"optional"}],"caption":"one or two sentences explaining the whole picture"}
+{"title":"API Request Flow","nodes":[{"id":"client","label":"Client App","tone":"base","layer":0},{"id":"api","label":"REST API","tone":"signal","layer":1},{"id":"db","label":"Database","tone":"base","layer":2}],"edges":[{"from":"client","to":"api","label":"HTTP POST"},{"from":"api","to":"db","label":"Query"}],"caption":"Client sends request through API to database with success feedback"}
 \`\`\`
+
+COMMON FAILURES TO AVOID:
+- Truncated strings: "tone":"bas  <-- WRONG (incomplete)
+- Missing quotes: {tone: base}  <-- WRONG (invalid JSON)
+- Trailing commas: {"id":"a",}  <-- WRONG (syntax error)
+- Wrong tone values: "tone":"success"  <-- WRONG (must be exactly "signal")
+
 Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read.
 `.trim();
 
