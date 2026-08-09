@@ -35,11 +35,30 @@ export function Box({ x, y, w, h, label, tone = "base" }: { x: number; y: number
 export function Arrow({ x1, y1, x2, y2, label }: { x1: number; y1: number; x2: number; y2: number; label?: string }) {
   const mx = (x1 + x2) / 2;
   const my = (y1 + y2) / 2;
+  // Calculate perpendicular offset for label positioning to avoid overlap
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const length = Math.sqrt(dx * dx + dy * dy) || 1;
+  const offsetX = (-dy / length) * 12; // Perpendicular offset
+  const offsetY = (dx / length) * 12;
+
   return (
     <g className="stroke-base-500">
       <line x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={1.5} markerEnd="url(#arrowhead)" />
       {label && (
-        <text x={mx} y={my - 4} textAnchor="middle" className="fill-base-500 text-[9px]" style={{ paintOrder: "stroke", stroke: "var(--tw-color-base-950, #0a0e12)", strokeWidth: 3 }}>
+        <text
+          x={mx + offsetX}
+          y={my + offsetY}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="fill-base-400 text-[10px] font-medium"
+          style={{
+            paintOrder: "stroke",
+            stroke: "var(--tw-color-base-950, #0a0e12)",
+            strokeWidth: 4,
+            strokeLinejoin: "round"
+          }}
+        >
           {label}
         </text>
       )}

@@ -8,8 +8,8 @@ type Tone = "base" | "signal" | "flare" | "amber";
 export interface DiagramSpec {
   title?: string;
   /** Free-form flow, architecture, comparison, or troubleshooting diagram. */
-  nodes: { id: string; label: string; tone?: Tone; layer?: number }[];
-  edges?: { from: string; to: string; label?: string }[];
+  nodes: { id: string; label: string; tone?: Tone; layer?: number; description?: string }[];
+  edges?: { from: string; to: string; label?: string; description?: string }[];
   caption?: string;
 }
 
@@ -62,6 +62,7 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
         const from = positions.get(e.from);
         const to = positions.get(e.to);
         if (!from || !to) return null;
+        // Point arrows to center of boxes with proper offset
         const x1 = from.x + NODE_W;
         const y1 = from.y + NODE_H / 2;
         const x2 = to.x;
