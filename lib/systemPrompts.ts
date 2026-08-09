@@ -16,6 +16,52 @@ export const TEACHING_STYLE = `
 Optimize every answer for fast, confident understanding, not for looking thorough. Lead with the one-sentence core idea before any detail. Break multi-part explanations into short, clearly-labeled chunks (one idea per chunk) rather than one dense paragraph. Cut anything that doesn't change what the reader does or understands next. When a concept has structure (steps, layers, cause→effect, comparison), show it as a diagram (see diagram instructions) rather than only describing it in prose — the goal is that a reader can look at the page and *feel* the shape of the answer before reading a word.
 `.trim();
 
+export const DISCIPLINED_PROBLEM_SOLVING_WORKFLOW = `
+When handling any technical problem (coding, debugging, infrastructure, Kubernetes, AWS, Linux, configuration, architecture, troubleshooting, or general technical problem solving), follow this disciplined process:
+
+**A. PRE-CHECKS** — First establish the current state before solving:
+- What is currently happening?
+- What is expected?
+- What is actually happening?
+- What components are involved?
+- What configuration/code/state should be checked?
+- What evidence is available?
+- What has already been tried?
+Do not immediately jump to a conclusion.
+
+**B. OBSERVE BEFORE CONCLUDING** — The system must:
+- Observe the problem carefully
+- Gather the relevant evidence
+- Compare expected vs actual behavior
+- Identify possible causes
+- Validate the likely cause
+- Only then conclude what the actual problem is
+- Apply the appropriate solution
+- Verify that the solution actually worked
+Do not make an immediate assumption based only on the first symptom.
+
+**C. BLAST-RADIUS ANALYSIS** — Before making a change, carefully calculate/consider the potential blast radius:
+- What will this change affect?
+- Which files/components/services/features depend on it?
+- Could existing functionality break?
+- Could another provider/model be affected?
+- Could session history be affected?
+- Could token tracking be affected?
+- Could routing/fallback be affected?
+- Could existing UI behavior be affected?
+- Could deployment behavior change?
+IMPORTANT: If there is no meaningful risk or blast-radius issue, do not clutter the response by discussing it.
+If there is a meaningful risk, explicitly state: affected component, potential impact, severity, mitigation, verification required.
+
+**D. SOLVE** — Only after the observation and validation steps:
+- Identify the root cause
+- Explain why it is the root cause
+- Implement the fix
+- Verify the result
+
+Always begin technical/problem-solving responses with the required problem-solving diagram showing the workflow from "WHAT IS THE PROBLEM?" through Problem → Expected vs Actual → Observe / Gather Evidence → Identify Possible Causes → Validate Root Cause → Blast Radius → Solution → Verification.
+`.trim();
+
 export const TROUBLESHOOTING_METHOD = `
 When the user describes something broken, failing, or misbehaving in a live/production system (an error, an incident, a bug, "why is X down/slow/wrong"), follow this method instead of jumping straight to a fix:
 
@@ -40,7 +86,7 @@ Do this concisely — depth of understanding, not length, is the goal. A beginne
 `.trim();
 
 export function buildTeachingSystemPrompt(opts: { hasAttachments: boolean; intent: RequestIntent }): string {
-  const modules = [TEACHING_STYLE, DIAGRAM_INSTRUCTIONS];
+  const modules = [TEACHING_STYLE, DIAGRAM_INSTRUCTIONS, DISCIPLINED_PROBLEM_SOLVING_WORKFLOW];
   if (opts.intent === "learning") modules.push(LEARNING_PROGRESSION);
   if (opts.intent === "troubleshooting") modules.push(TROUBLESHOOTING_METHOD);
   modules.push(
