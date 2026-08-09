@@ -16,6 +16,44 @@ export const TEACHING_STYLE = `
 Optimize every answer for fast, confident understanding, not for looking thorough. Lead with the one-sentence core idea before any detail. Break multi-part explanations into short, clearly-labeled chunks (one idea per chunk) rather than one dense paragraph. Cut anything that doesn't change what the reader does or understands next. When a concept has structure (steps, layers, cause→effect, comparison), show it as a diagram (see diagram instructions) rather than only describing it in prose — the goal is that a reader can look at the page and *feel* the shape of the answer before reading a word.
 `.trim();
 
+export const END_SUMMARY_WORKFLOW = `
+At the end of every completed solution, provide a final summary that includes:
+1. What we did
+2. Problem
+3. Root cause
+4. Change made
+5. Validation performed
+6. Final result
+
+Always conclude technical responses with this end-summary diagram:
+\`\`\`diagram
+{"title":"Solution Summary","nodes":[{"id":"p","label":"Problem: [brief description]","tone":"flare","layer":0},{"id":"r","label":"Root Cause: [root cause identified]","tone":"amber","layer":0},{"id":"a","label":"Action: [what was done]","tone":"base","layer":0},{"id":"v","label":"Verify: [validation method]","tone":"signal","layer":0},{"id":"f","label":"Final Result: [outcome achieved]","tone":"signal","layer":1}],"edges":[{"from":"p","to":"r"},{"from":"r","to":"a"},{"from":"a","to":"v"},{"from":"v","to":"f"}],"caption":"Complete solution journey from problem identification to verified result"}
+\`\`\`
+`.trim();
+
+export const LOADING_CONTENT_WORKFLOW = `
+When the application is routing a request, waiting for an answer, analyzing a request, waiting for the selected model, performing model selection/recommendation, or waiting for a provider response, do not leave the user looking at an empty/static loading state.
+
+Use the configured free API keys/providers to generate useful content that can be displayed while the main response is being prepared. The goal is to make the waiting/routing experience useful.
+
+Free provider behavior:
+- Use the free API providers that are actually configured and available in the application
+- Before the main answer is ready, collect approximately 10 short relevant items from the available free providers
+- Detect configured free providers
+- Validate/use the providers that are currently available
+- Distribute the small preliminary requests intelligently
+- Collect useful short pieces of information
+- Display them progressively while the main request is routing/waiting
+- Continue normally to the actual selected model response
+- Never let this loading content replace the real answer
+- Do not unnecessarily consume large token amounts
+- Keep these preliminary requests small and lightweight
+- If a provider fails, rate-limits, or is unavailable, automatically continue with another available free provider
+- Do not allow the loading-content feature to break the main request
+
+When responding during loading states, provide short, useful micro-content from available free providers to enhance the user experience while waiting for the primary response.
+`.trim();
+
 export const DISCIPLINED_PROBLEM_SOLVING_WORKFLOW = `
 When handling any technical problem (coding, debugging, infrastructure, Kubernetes, AWS, Linux, configuration, architecture, troubleshooting, or general technical problem solving), follow this disciplined process:
 
@@ -86,7 +124,7 @@ Do this concisely — depth of understanding, not length, is the goal. A beginne
 `.trim();
 
 export function buildTeachingSystemPrompt(opts: { hasAttachments: boolean; intent: RequestIntent }): string {
-  const modules = [TEACHING_STYLE, DIAGRAM_INSTRUCTIONS, DISCIPLINED_PROBLEM_SOLVING_WORKFLOW];
+  const modules = [TEACHING_STYLE, DIAGRAM_INSTRUCTIONS, DISCIPLINED_PROBLEM_SOLVING_WORKFLOW, END_SUMMARY_WORKFLOW, LOADING_CONTENT_WORKFLOW];
   if (opts.intent === "learning") modules.push(LEARNING_PROGRESSION);
   if (opts.intent === "troubleshooting") modules.push(TROUBLESHOOTING_METHOD);
   modules.push(
