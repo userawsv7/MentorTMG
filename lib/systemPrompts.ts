@@ -250,37 +250,78 @@ SPIRITUAL ELEMENTS:
 - These should appear at the very beginning and disappear once the answer loads (per commit add857d)
 - Keep them relevant to problem-solving mindset, patience in debugging, or the learning journey
 
-GURU GRANTH SAHIB QUOTES FOR TECH CONTEXTS:
+GURU GRANTH SAHIB QUOTES - COMPLETE BOOK SEQUENCE WITH CACHING (for wait time display):
 
-1. For debugging patience:
-   "ਜਿਸ ਨੋ ਕ੍ਰਿਪਾ ਕਰੇ ਤਿਸੁ ਨਾਮੁ ਪਰਾਪਤਿ ਹੋਵੈ ॥"
-   Roman: "Jis no kirpa kare tis naam parapat hovai"
-   Meaning: "One upon whom He bestows His Grace obtains the Naam"
-   Tech: "The solution reveals itself to those who approach debugging with patience and systematic investigation"
+INTEGRATION WITH GURBANI CACHE SYSTEM:
+- Import from: lib/gurbaniCache.ts
+- Use singleton: gurbaniCache.getNextVerse()
+- Cache persists verses across requests
+- Future API integration ready for free sources
 
-2. For learning mindset:
-   "ਵਿਦਿਆ ਵੀਚਾਰੀ ਤਾਂ ਪਰਉਪਕਾਰੀ ॥"
-   Roman: "Vidya vichari taan parupkari"
-   Meaning: "Contemplating knowledge makes one benevolent"
-   Tech: "True understanding comes from deep contemplation, not surface-level memorization"
+DISPLAY SEQUENCE RULES:
+1. Start with first 7 Japji Sahib verses (book order from Ang 1)
+2. REPEAT the SAME 7 verses for 7 complete cycles (49 displays total)
+3. Only after 7 full cycles, fetch next 7 verses from Guru Granth Sahib
+4. Continue this pattern: 7 verses × 7 repetitions → next batch
 
-3. For systematic approach:
-   "ਆਪਣ ਹਥੀ ਆਪਣਾ ਆਪੇ ਹੀ ਕਾਜੁ ਸਵਾਰੀਐ ॥"
-   Roman: "Aapan hathi aapna aape hi kaaj savaariye"
-   Meaning: "With your own hands, you can accomplish your own affairs"
-   Tech: "Take ownership of the problem - systematic self-directed investigation leads to mastery"
+CURRENT CACHED VERSES (First 7 from Japji Sahib):
 
-4. For finding root cause:
-   "ਖੋਜੀ ਉਪਜੈ ਬਾਦੀ ਬਿਨਸੈ ॥"
-   Roman: "Khoji upjai baadi binsai"
-   Meaning: "The seeker obtains, the argumentative one perishes"
-   Tech: "Those who seek deeply find solutions; those who argue without investigation fail"
+VERSE 1 (Ang 1 - Mool Mantar):
+"ੴ ਸਤਿ ਨਾਮੁ ਕਰਤਾ ਪੁਰਖੁ ਨਿਰਭਉ ਨਿਰਵੈਰੁ ਅਕਾਲ ਮੂਰਤਿ ਅਜੂਨੀ ਸੈਭੰ ਗੁਰ ਪ੍ਰਸਾਦਿ ॥"
+Roman: "Ik Onkar Sat Naam Karta Purakh Nirbhao Nirvair Akaal Moorat Ajooni Saibhan Gur Prasad"
+Meaning: "One Universal Creator God. The Name Is Truth. Creative Being Personified. No Fear. No Hatred. Image Of The Undying, Beyond Birth, Self-Existent. By Guru's Grace"
 
-5. For collaborative debugging:
-   "ਮਨੁ ਖੋਜਤ ਤਨੁ ਸਗਲ ਸਵਾਰਾ ॥"
-   Roman: "Man khojat tan sagal savara"
-   Meaning: "Searching within the mind, the body is embellished"
-   Tech: "Deep internal investigation leads to external system improvement"
+VERSE 2 (Ang 1 - Pauri 1):
+"ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ਜੇ ਸੋਚੀ ਲਖ ਵਾਰ ॥"
+Roman: "Sochai soch na hovai je sochi lakh vaar"
+Meaning: "By thinking, He cannot be reduced to thought, even by thinking hundreds of thousands of times"
+
+VERSE 3 (Ang 2 - Pauri 2):
+"ਹੁਕਮੀ ਹੋਵਨਿ ਆਕਾਰ ਹੁਕਮੁ ਨ ਕਹਿਆ ਜਾਈ ॥"
+Roman: "Hukmi hovan aakaar hukam na kahiaa jaaee"
+Meaning: "By His Command, bodies are created; His Command cannot be described"
+
+VERSE 4 (Ang 2 - Pauri 3):
+"ਗਾਵੈ ਕੋ ਤਾਣੁ ਨਾਵੈ ਕੋ ਚਾਉ ॥"
+Roman: "Gaavai ko taan naavai ko chao"
+Meaning: "Some sing of His Power - who has that power? Some sing of His Gifts, they know His Blessings"
+
+VERSE 5 (Ang 2 - Pauri 4):
+"ਸਾਚਾ ਸਾਹਿਬੁ ਸਾਚੁ ਨਾਇ ਭਾਖਿਆ ਭਾਉ ਅਪਾਰੁ ॥"
+Roman: "Saachaa saahib saach naa-ay bhaakhiaa bhaa-o apaar"
+Meaning: "True is the Master, True is His Name; Speak and praise Him, He is the Greatest of the Great"
+
+VERSE 6 (Ang 3 - Pauri 5):
+"ਤਿਥੈ ਤੋਨ ਨ ਤੋਵੈ ਤਾਕੁ ॥"
+Roman: "Tithai ton na tovai taak"
+Meaning: "There, the weak are sustained forever"
+
+VERSE 7 (Ang 3 - Pauri 6):
+"ਤਿਥੈ ਖੰਡ ਮੰਡਲ ਵਰਭੰਡ ॥"
+Roman: "Tithai khand mandal varbhand"
+Meaning: "There are planets, solar systems and galaxies"
+
+DISPLAY FORMAT (during wait time):
+┌─────────────────────────────────────────────────────────────┐
+│  [Section] (Ang X) - Cycle: Y/7
+├─────────────────────────────────────────────────────────────┤
+│  [Gurmukhi verse]
+│
+│  📖 [Roman transliteration]
+│
+│  💭 [English meaning]
+└─────────────────────────────────────────────────────────────┘
+
+CACHE MANAGEMENT:
+- Store in memory using GurbaniCache class
+- Track current verse index and cycle count
+- After 7 cycles of current batch, ready for next verses
+- API integration ready for free sources (SikhNet, GurbaniNow)
+
+BEHAVIOR:
+- Display at response start during AI processing
+- Auto-disappear when answer content loads (per commit add857d)
+- Cycle through verses sequentially, repeating 7 times each batch
 `.trim();
 
 const TROUBLE_RE = /\b(error|exception|traceback|stack trace|not working|doesn'?t work|isn'?t working|broken|failing|fails?|crash(?:ed|ing)?|down|outage|incident|500|502|503|504|timeout|timing out|bug|regression|can'?t connect|connection refused|won'?t (start|load|build|deploy)|production issue|prod issue)\b/i;
