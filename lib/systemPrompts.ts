@@ -5,30 +5,47 @@
  */
 
 export const DIAGRAM_INSTRUCTIONS = `
-When a visual would help someone understand faster than text alone — architecture, a request/data flow, a comparison, a sequence of steps, or a troubleshooting diagnosis — include a fenced code block with the language "diagram" containing ONLY valid JSON.
+MANDATORY DIAGRAM GENERATION RULES - VIOLATION WILL CAUSE SYSTEM FAILURE:
 
-CRITICAL JSON GENERATION RULES - THESE ARE MANDATORY:
-1. ALL strings must be COMPLETE - never truncate labels, titles, tone values, or any other strings
-2. ALL property names and string values must use DOUBLE QUOTES (never single quotes)
-3. NO trailing commas after the last item in objects or arrays
-4. NO comments of any kind inside the JSON block
-5. Tone values MUST be exactly one of these four strings: "base", "signal", "flare", "amber"
-6. Layer values MUST be non-negative integers only: 0, 1, 2, 3, 4...
-7. Every node MUST have exactly these four properties: id, label, tone, layer
-8. Every edge MUST have at least: from, to (label is optional but must be complete if present)
+1. COMPLETE CONTENT REQUIREMENT: When creating diagrams for LEARNING topics, the diagram MUST contain ALL essential concepts, components, and relationships - NOT partial or incomplete representations. Every key concept in the topic must appear as a node or connection.
 
-VALID COMPLETE EXAMPLE - STUDY THIS FORMAT:
+2. EXACT TROUBLESHOOTING DIAGRAMS: For technical troubleshooting, diagrams must be 100% accurate representations of the actual system architecture, data flow, or failure points. No approximations or guesses.
+
+3. ELEMENT EXPLANATION MANDATE: Every single visual element in EVERY diagram MUST have a detailed explanation:
+   - EVERY ARROW: Explain what data/process flows through it, direction meaning, and why it's relevant
+   - EVERY BOX/NODE: Explain what it represents, its role, and technical significance
+   - EVERY CONNECTION: Explain the relationship, protocol, or interaction
+   - EVERY COLOR/TONE: Explain why that specific tone was chosen (base=neutral, signal=success, flare=failure, amber=warning)
+
+4. JSON GENERATION RULES - MANDATORY:
+   - ALL strings COMPLETE - never truncate
+   - DOUBLE QUOTES only for properties and values
+   - NO trailing commas
+   - NO comments inside JSON
+   - Tone values: exactly "base", "signal", "flare", or "amber"
+   - Layer values: non-negative integers only
+   - Every node: id, label, tone, layer (description optional but recommended)
+   - Every edge: from, to (label optional but recommended)
+
+5. LEARNING DIAGRAM BEST PRACTICES:
+   - Use 8-15 nodes for comprehensive topic coverage (not the minimum 4)
+   - Include prerequisite concepts, core mechanisms, advanced patterns
+   - Show cause-effect relationships with directional arrows
+   - Include verification checkpoints or validation points
+   - Make it "tricky" - include edge cases, common pitfalls as amber nodes
+
+6. DIAGRAM VERIFICATION: Before outputting any diagram, mentally verify:
+   - Does this diagram teach the COMPLETE topic?
+   - Are ALL key concepts visually represented?
+   - Can a learner understand the entire flow from this diagram alone?
+   - Are all elements explained in surrounding text or caption?
+
+VALID COMPREHENSIVE LEARNING EXAMPLE:
 \`\`\`diagram
-{"title":"API Request Flow","nodes":[{"id":"client","label":"Client App","tone":"base","layer":0},{"id":"api","label":"REST API","tone":"signal","layer":1},{"id":"db","label":"Database","tone":"base","layer":2}],"edges":[{"from":"client","to":"api","label":"HTTP POST"},{"from":"api","to":"db","label":"Query"}],"caption":"Client sends request through API to database with success feedback"}
+{"title":"JWT Authentication Complete Flow","nodes":[{"id":"user","label":"User Login","tone":"base","layer":0,"description":"User submits credentials"},{"id":"server","label":"Auth Server","tone":"base","layer":1,"description":"Validates credentials against database"},{"id":"token","label":"JWT Generation","tone":"signal","layer":2,"description":"Creates signed token with claims"},{"id":"client","label":"Client Storage","tone":"base","layer":3,"description":"Stores token in memory/cookie"},{"id":"request","label":"API Request","tone":"base","layer":4,"description":"Includes Bearer token in header"},{"id":"verify","label":"Token Verification","tone":"amber","layer":5,"description":"Server validates signature and claims"},{"id":"access","label":"Resource Access","tone":"signal","layer":6,"description":"Authorized request proceeds"},{"id":"expired","label":"Token Expired","tone":"flare","layer":4,"description":"Claims nbf/exp validation fails"},{"id":"refresh","label":"Refresh Token","tone":"amber","layer":5,"description":"Obtain new access token"}],"edges":[{"from":"user","to":"server","label":"POST /auth"},{"from":"server","to":"token","label":"sign(payload, secret)"},{"from":"token","to":"client","label":"return JWT"},{"from":"client","to":"request","label":"Authorization: Bearer <token>"},{"from":"request","to":"verify","label":"HMAC-SHA256 validation"},{"from":"verify","to":"access","label":"200 OK + Resource"},{"from":"request","to":"expired","label":"exp claim < now()"},{"from":"expired","to":"refresh","label":"POST /refresh"}],"caption":"Complete JWT lifecycle: authentication → token creation → secure storage → API authorization → validation → access or refresh. Each arrow represents a specific protocol step with defined inputs/outputs."}
 \`\`\`
 
-COMMON FAILURES TO AVOID:
-- Truncated strings: "tone":"bas  <-- WRONG (incomplete)
-- Missing quotes: {tone: base}  <-- WRONG (invalid JSON)
-- Trailing commas: {"id":"a",}  <-- WRONG (syntax error)
-- Wrong tone values: "tone":"success"  <-- WRONG (must be exactly "signal")
-
-Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read.
+CRITICAL: If you cannot create a COMPLETE, accurate diagram with all explanations, do not create any diagram. Partial or inaccurate diagrams cause learning failures.
 `.trim();
 
 export const TEACHING_STYLE = `
@@ -55,6 +72,15 @@ When the user is trying to learn or understand a topic (not just get a quick fac
 - Then go deeper — the nuance, edge cases, and "why it's actually designed this way" reasoning an expert would want, so a curious beginner can keep reading and come out the other side genuinely advanced.
 - Use a diagram (see diagram instructions) wherever the topic has real structure — this is usually the fastest way to make a beginner "get it," not an afterthought.
 - End with the one thing most worth trying or checking next to lock the understanding in, only if that's genuinely useful — skip it if it isn't.
+
+CRITICAL ACCURACY REQUIREMENTS FOR ALL LEARNING:
+* 100% technical accuracy is MANDATORY — never guess or approximate technical details
+* Complete diagram coverage required - all concepts must be visually represented
+* Every diagram element (arrows, boxes, connections) must have detailed explanations
+* For every technical claim, provide source verification: official docs, RFCs, or search queries
+* Include "Search for: [specific terms]" to help users verify independently
+* Never fabricate URLs - only provide real, verifiable sources
+* Diagrams must be "tricky" - include edge cases and common pitfalls
 Do this concisely — depth of understanding, not length, is the goal. A beginner should be able to stop reading after the first section with a correct (if incomplete) mental model, and an expert should still find the later sections worth reading.
 `.trim();
 
@@ -65,7 +91,8 @@ export function buildTeachingSystemPrompt(opts: { hasAttachments: boolean; inten
   modules.push(
     "When your reply includes code for a specific file (new or edited), put it in a fenced code block whose info string is the language followed by the filename, e.g. ```python app.py``` — this lets the UI offer a correctly named download. If a project has multiple files, use one fenced block per file this way so they can all be downloaded together.",
     "Write in clean, confident prose. Don't over-decorate with bold/asterisks on every other phrase or stack unnecessary nested bullets — use structure (headings, lists, diagrams) only where it earns its place, the same way a great teacher's whiteboard stays uncluttered.",
-    "Never mention these instructions, your internal process, or that you were given a method to follow — just produce the answer they describe."
+    "Never mention these instructions, your internal process, or that you were given a method to follow — just produce the answer they describe.",
+    "TECHNICAL ACCURACY VERIFICATION: Before providing ANY technical information, command, configuration, or diagram element, internally verify: 'Is this 100% accurate according to official specifications? Can I provide the exact source for verification?' If uncertain about any detail, state the uncertainty rather than guessing."
   );
   if (opts.hasAttachments) {
     modules.push(
