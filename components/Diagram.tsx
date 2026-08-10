@@ -24,7 +24,7 @@ export function Box({ x, y, w, h, label, tone = "base" }: { x: number; y: number
     <g>
       <rect x={x} y={y} width={w} height={h} rx={10} className={toneClasses[tone]} strokeWidth={1.5} />
       <foreignObject x={x + 6} y={y} width={w - 12} height={h}>
-        <div className={`h-full flex items-center justify-center text-center text-[11px] leading-tight font-medium ${textClasses[tone].replace("fill-", "text-")}`}>
+        <div className={`h-full flex items-center justify-center text-center text-[11px] leading-tight font-medium ${textClasses[tone].replace("fill-", "text-")}`} style={{padding: '2px'}}>
           {label}
         </div>
       </foreignObject>
@@ -39,8 +39,8 @@ export function Arrow({ x1, y1, x2, y2, label }: { x1: number; y1: number; x2: n
   const dx = x2 - x1;
   const dy = y2 - y1;
   const length = Math.sqrt(dx * dx + dy * dy) || 1;
-  const offsetX = (-dy / length) * 12; // Perpendicular offset
-  const offsetY = (dx / length) * 12;
+  const offsetX = (-dy / length) * 14; // Increased perpendicular offset for better spacing
+  const offsetY = (dx / length) * 14;
 
   return (
     <g className="stroke-base-500">
@@ -51,11 +51,11 @@ export function Arrow({ x1, y1, x2, y2, label }: { x1: number; y1: number; x2: n
           y={my + offsetY}
           textAnchor="middle"
           dominantBaseline="middle"
-          className="fill-base-400 text-[10px] font-medium"
+          className="fill-base-300 text-[10px] font-medium"
           style={{
             paintOrder: "stroke",
             stroke: "var(--tw-color-base-950, #0a0e12)",
-            strokeWidth: 4,
+            strokeWidth: 5,
             strokeLinejoin: "round"
           }}
         >
@@ -79,19 +79,21 @@ export function ArrowDefs() {
 export function RelayFlowDiagram() {
   return (
     <figure className="rounded-xl border border-base-700 bg-base-900/40 p-3">
-      <svg viewBox="0 0 560 130" className="w-full h-auto">
+      <svg viewBox="0 0 600 140" className="w-full h-auto">
         <ArrowDefs />
-        <Box x={10} y={45} w={110} h={40} label="Your message" tone="base" />
-        <Arrow x1={120} y1={65} x2={158} y2={65} />
-        <Box x={160} y={20} w={130} h={40} label="Try top-ranked model" tone="signal" />
-        <Arrow x1={225} y1={60} x2={225} y2={78} />
-        <Box x={160} y={80} w={130} h={40} label="Fails? try next in chain" tone="amber" />
-        <Arrow x1={292} y1={40} x2={330} y2={40} />
-        <Box x={332} y={20} w={110} h={40} label="First success answers you" tone="signal" />
-        <Arrow x1={292} y1={100} x2={330} y2={100} />
-        <Box x={332} y={80} w={110} h={40} label="All fail → clear error + fixes" tone="flare" />
-        <Arrow x1={442} y1={40} x2={480} y2={40} />
-        <Box x={482} y={20} w={70} h={40} label="Reply shown" tone="base" />
+        <Box x={10} y={50} w={100} h={38} label="Your message" tone="base" />
+        <Arrow x1={110} y1={69} x2={145} y2={69} />
+        <Box x={147} y={25} w={125} h={38} label="Try top-ranked model" tone="signal" />
+        <Arrow x1={209} y1={63} x2={209} y2={88} />
+        <Box x={147} y={90} w={125} h={38} label="Fails? try next in chain" tone="amber" />
+        <Arrow x1={272} y1={44} x2={305} y2={44} />
+        <Box x={307} y={25} w={115} h={38} label="First success answers" tone="signal" />
+        <Arrow x1={272} y1={109} x2={305} y2={109} />
+        <Box x={307} y={90} w={115} h={38} label="All fail → clear error" tone="flare" />
+        <Arrow x1={422} y1={44} x2={455} y2={44} />
+        <Box x={457} y={25} w={80} h={38} label="Reply shown" tone="base" />
+        <Arrow x1={422} y1={109} x2={455} y2={109} />
+        <Box x={457} y={90} w={80} h={38} label="Show fixes" tone="base" />
       </svg>
       <figcaption className="mt-2 text-xs text-base-500">
         Relay tries models in ranked order for your chosen purpose. The moment one succeeds, that's your answer — a

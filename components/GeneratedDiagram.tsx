@@ -87,6 +87,9 @@ const PAD = 24;
  */
 export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
   const [expanded, setExpanded] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
 
   // Validate the diagram spec before any processing to prevent crashes from AI-generated invalid JSON
   const validatedSpec = validateDiagramSpec(spec);
@@ -159,18 +162,54 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
     </svg>
   );
 
+  const zoomIn = () => setZoom(Math.min(zoom * 1.2, 4));
+  const zoomOut = () => setZoom(Math.max(zoom / 1.2, 0.25));
+  const resetZoom = () => { setZoom(1); setPanX(0); setPanY(0); };
+  const fitToView = () => { setZoom(0.8); setPanX(0); setPanY(0); };
+
+  const enhancedSvg = (
+    <svg
+      viewBox={`0 0 ${width} ${Math.max(height, NODE_H + PAD * 2)}`}
+      className="w-full h-auto cursor-grab"
+      style={{
+        transform: `scale(${zoom}) translate(${panX}px, ${panY}px)`,
+        transformOrigin: 'center center',
+        transition: 'transform 0.1s ease-out'
+      }}
+    >
+      <ArrowDefs />
+      {(spec.edges ?? []).map((e, i) => {
+        const from = positions.get(e.from);
+        const to = positions.get(e.to);
+        if (!from || !to) return null;
+        const x1 = from.x + NODE_W;
+        const y1 = from.y + NODE_H / 2;
+        const x2 = to.x;
+        const y2 = to.y + NODE_H / 2;
+        return <Arrow key={i} x1={x1} y1={y1} x2={x2} y2={y2} label={e.label} />;
+      })}
+      {spec.nodes.map((n) => {
+        const pos = positions.get(n.id);
+        if (!pos) return null;
+        return <Box key={n.id} x={pos.x} y={pos.y} w={NODE_W} h={NODE_H} label={n.label} tone={n.tone ?? "base"} />;
+      })}
+    </svg>
+  );
+
   return (
     <>
       <figure className="group relative rounded-xl border border-base-700 bg-base-900/40 p-3 my-2 not-prose">
         {spec.title && <p className="text-xs font-medium text-base-300 mb-1.5">{spec.title}</p>}
-        <button
-          onClick={() => setExpanded(true)}
-          title="Expand diagram"
-          aria-label="Expand diagram"
-          className="absolute top-2.5 right-2.5 h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 opacity-0 group-hover:opacity-100 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
-        >
-          ⤢
-        </button>
+        <div className="absolute top-2.5 right-2.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+          <button
+            onClick={() => setExpanded(true)}
+            title="Expand diagram"
+            aria-label="Expand diagram"
+            className="h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
+          >
+            ⤢
+          </button>
+        </div>
         {svg}
         {spec.caption && <figcaption className="mt-2 text-xs text-base-500">{spec.caption}</figcaption>}
       </figure>
@@ -178,16 +217,27 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
       {expanded && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-6"
-          onClick={() => setExpanded(false)}
+          onClick={() => { setExpanded(false); resetZoom(); }}
         >
-          <div className="w-full max-w-4xl bg-base-900 border border-base-700 rounded-2xl shadow-glow p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-3">
+          <div className="w-full max-w-6xl bg-base-900 border border-base-700 rounded-2xl shadow-glow p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
               {spec.title && <p className="text-sm font-medium text-base-200">{spec.title}</p>}
-              <button onClick={() => setExpanded(false)} className="ml-auto text-base-400 hover:text-signal-400 text-sm" aria-label="Close">
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 border border-base-600 rounded-md p-1">
+                  <button onClick={zoomOut} className="px-2 py-1 text-sm hover:text-signal-400" title="Zoom out">−</button>
+                  <span className="px-2 text-xs text-base-400">{Math.round(zoom * 100)}%</span>
+                  <button onClick={zoomIn} className="px-2 py-1 text-sm hover:text-signal-400" title="Zoom in">+</button>
+                  <button onClick={resetZoom} className="px-2 py-1 text-xs hover:text-signal-400 border-l border-base-600 ml-1" title="Reset zoom">⟲</button>
+                  <button onClick={fitToView} className="px-2 py-1 text-xs hover:text-signal-400" title="Fit to view">⤡</button>
+                </div>
+                <button onClick={() => { setExpanded(false); resetZoom(); }} className="text-base-400 hover:text-signal-400 text-sm ml-2" aria-label="Close">
+                  ✕
+                </button>
+              </div>
             </div>
-            {svg}
+            <div className="overflow-auto max-h-[70vh] bg-base-950 rounded-lg p-4 border border-base-700">
+              {enhancedSvg}
+            </div>
             {spec.caption && <p className="mt-3 text-sm text-base-400">{spec.caption}</p>}
           </div>
         </div>
