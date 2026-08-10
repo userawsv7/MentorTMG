@@ -346,6 +346,26 @@ async function callReplicate(
  * exhausted. Every attempt — success, failure, or skip — is logged so
  * the UI can render the relay/fallback trail.
  */
+// Spiritual quotes to display during free API key routing (from commits)
+const SPIRITUAL_QUOTES = [
+  "The journey of a thousand miles begins with a single API call.",
+  "In the silence between requests, wisdom emerges.",
+  "Every timeout teaches patience; every success, gratitude.",
+  "The API key you seek is already within your dashboard.",
+  "When one provider fails, another path reveals itself.",
+  "Rate limits are but gentle reminders to breathe.",
+  "The best debugging happens in a state of flow.",
+  "Your code and the universe share the same source.",
+];
+
+let currentQuoteIndex = 0;
+
+export function getNextSpiritualQuote(): string {
+  const quote = SPIRITUAL_QUOTES[currentQuoteIndex];
+  currentQuoteIndex = (currentQuoteIndex + 1) % SPIRITUAL_QUOTES.length;
+  return quote;
+}
+
 export async function routeChat(opts: {
   mode: "free" | "kodekey";
   chain: ChainLink[];

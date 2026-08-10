@@ -3,6 +3,62 @@
 import { useState } from "react";
 import { Box, Arrow, ArrowDefs } from "./Diagram";
 
+// Zoom and Copy functionality
+const downloadDiagram = (svgElement: SVGSVGElement, title: string) => {
+  const svgData = new XMLSerializer().serializeToString(svgElement);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+  const img = new Image();
+
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.fillStyle = "#0a0a0a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+
+    const link = document.createElement("a");
+    link.download = `${title || 'diagram'}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+};
+
+const copyDiagramAsImage = async (svgElement: SVGSVGElement) => {
+  const svgData = new XMLSerializer().serializeToString(svgElement);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+  const img = new Image();
+
+  return new Promise<void>((resolve, reject) => {
+    img.onload = async () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.fillStyle = "#0a0a0a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob })
+            ]);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        }
+      });
+    };
+
+    img.onerror = reject;
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+  });
+};
+
 type Tone = "base" | "signal" | "flare" | "amber";
 
 export interface DiagramSpec {
@@ -76,18 +132,71 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
     </svg>
   );
 
+  // Get the SVG element for copy/download functions
+  const getSvgElement = () => {
+    const figures = document.querySelectorAll('figure');
+    for (const fig of figures) {
+      const svg = fig.querySelector('svg');
+      if (svg) return svg as SVGSVGElement;
+    }
+    return null;
+  };
+
+  const handleCopy = async () => {
+    const svgEl = getSvgElement();
+    if (svgEl) {
+      try {
+        await copyDiagramAsImage(svgEl);
+        // Show success feedback
+        const btn = event?.currentTarget as HTMLButtonElement;
+        if (btn) {
+          const origText = btn.innerHTML;
+          btn.innerHTML = '✓';
+          setTimeout(() => { btn.innerHTML = origText; }, 1000);
+        }
+      } catch (err) {
+        console.error('Failed to copy diagram:', err);
+      }
+    }
+  };
+
+  const handleDownload = () => {
+    const svgEl = getSvgElement();
+    if (svgEl) {
+      downloadDiagram(svgEl, spec.title || 'diagram');
+    }
+  };
+
   return (
     <>
       <figure className="group relative rounded-xl border border-base-700 bg-base-900/40 p-3 my-2 not-prose">
         {spec.title && <p className="text-xs font-medium text-base-300 mb-1.5">{spec.title}</p>}
-        <button
-          onClick={() => setExpanded(true)}
-          title="Expand diagram"
-          aria-label="Expand diagram"
-          className="absolute top-2.5 right-2.5 h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 opacity-0 group-hover:opacity-100 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
-        >
-          ⤢
-        </button>
+        <div className="absolute top-2.5 right-2.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+          <button
+            onClick={handleCopy}
+            title="Copy diagram as image"
+            aria-label="Copy diagram"
+            className="h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
+          >
+            📋
+          </button>
+          <button
+            onClick={handleDownload}
+            title="Download as PNG"
+            aria-label="Download diagram"
+            className="h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
+          >
+            ⬇
+          </button>
+          <button
+            onClick={() => setExpanded(true)}
+            title="Expand diagram"
+            aria-label="Expand diagram"
+            className="h-7 w-7 rounded-md border border-base-600 bg-base-900/80 text-base-400 hover:text-signal-400 hover:border-signal-500/40 transition-all flex items-center justify-center text-xs"
+          >
+            ⤢
+          </button>
+        </div>
         {svg}
         {spec.caption && <figcaption className="mt-2 text-xs text-base-500">{spec.caption}</figcaption>}
       </figure>
