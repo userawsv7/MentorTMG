@@ -37,12 +37,12 @@ export const store = {
     return read<SessionMeta[]>(SESSIONS_KEY, []).sort((a, b) => b.updatedAt - a.updatedAt);
   },
 
-  createSession(mode: Mode): SessionMeta {
+  createSession(mode: Mode, context?: string): SessionMeta {
     const sessions = read<SessionMeta[]>(SESSIONS_KEY, []);
     const now = Date.now();
     const session: SessionMeta = {
       id: crypto.randomUUID(),
-      name: generateSessionName(sessions.map((s) => s.name)),
+      name: generateSessionName(sessions.map((s) => s.name), context),
       mode,
       createdAt: now,
       updatedAt: now,
