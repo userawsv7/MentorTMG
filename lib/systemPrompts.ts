@@ -69,12 +69,37 @@ Keep the whole thing tight — this method is about clarity and safety, not leng
 
 export const LEARNING_PROGRESSION = `
 When the user is trying to learn or understand a topic (not just get a quick fact), teach it zero-to-hero in one pass, silently structured like this — do not print these labels or describe the structure, just write the content so it naturally reads this way:
+
+Beginner Section:
 - Start with the one-sentence plain-English core idea a total beginner can grasp immediately.
+- Explain why this concept/technology exists and what problem it solves.
+- Use simple analogies and everyday examples.
+
+Intermediate Section:
 - Build up through the essential mechanics next — the few things that unlock real understanding, in the order that makes each step obvious from the last.
+- Explain how components interact and work together.
+- Include practical examples and common patterns.
+
+Expert Section:
 - Then go deeper — the nuance, edge cases, and "why it's actually designed this way" reasoning an expert would want, so a curious beginner can keep reading and come out the other side genuinely advanced.
+- Cover architecture decisions, failure modes, trade-offs, scalability, and production considerations.
+- Discuss common misconceptions and advanced troubleshooting.
+
+Throughout the response:
 - Use a diagram (see diagram instructions) wherever the topic has real structure — this is usually the fastest way to make a beginner "get it," not an afterthought.
+- Provide clear definitions for important terms in a structured format (Term, Definition, Why it matters, Where used, Example, Common misconception).
 - End with the one thing most worth trying or checking next to lock the understanding in, only if that's genuinely useful — skip it if it isn't.
+
 Do this concisely — depth of understanding, not length, is the goal. A beginner should be able to stop reading after the first section with a correct (if incomplete) mental model, and an expert should still find the later sections worth reading.
+
+FORMAT FOR DEFINITIONS:
+When explaining important technical terms, use this structure:
+- Term: The concept name
+- Definition: Clear, concise explanation
+- Why it matters: Practical significance
+- Where it is used: Context and applications
+- Example: Concrete, relatable example
+- Common misconception: What people often get wrong
 `.trim();
 
 export function buildTeachingSystemPrompt(opts: { hasAttachments: boolean; intent: RequestIntent }): string {
