@@ -8,9 +8,68 @@ type Tone = "base" | "signal" | "flare" | "amber";
 export interface DiagramSpec {
   title?: string;
   /** Free-form flow, architecture, comparison, or troubleshooting diagram. */
-  nodes: { id: string; label: string; tone?: Tone; layer?: number }[];
-  edges?: { from: string; to: string; label?: string }[];
+  nodes: { id: string; label: string; tone?: Tone; layer?: number; description?: string }[];
+  edges?: { from: string; to: string; label?: string; description?: string }[];
   caption?: string;
+}
+
+/**
+ * Runtime validation for AI-generated diagram JSON
+ * Prevents crashes from malformed JSON (truncated strings, invalid syntax, etc.)
+ * Provides graceful error handling with user-friendly messages
+ */
+interface ValidatedDiagramSpec extends DiagramSpec {
+  isValid: boolean;
+  errors: string[];
+}
+
+const VALID_TONES: Tone[] = ["base", "signal", "flare", "amber"];
+
+function validateDiagramSpec(spec: any): ValidatedDiagramSpec {
+  const errors: string[] = [];
+
+  if (!spec || typeof spec !== 'object') {
+    return { isValid: false, errors: ["Spec is not a valid object"], nodes: [], edges: [] };
+  }
+
+  if (!Array.isArray(spec.nodes) || spec.nodes.length === 0) {
+    errors.push("Nodes array is required and must not be empty");
+  }
+
+  // Validate each node structure and values
+  spec.nodes?.forEach((node: any, index: number) => {
+    if (!node.id || typeof node.id !== 'string') {
+      errors.push(`Node ${index}: Missing or invalid 'id' property`);
+    }
+    if (!node.label || typeof node.label !== 'string') {
+      errors.push(`Node ${index}: Missing or invalid 'label' property`);
+    }
+    if (!node.tone || !VALID_TONES.includes(node.tone)) {
+      errors.push(`Node ${index}: Invalid 'tone' value '${node.tone}'. Must be one of: ${VALID_TONES.join(', ')}`);
+    }
+    if (typeof node.layer !== 'number' || node.layer < 0 || !Number.isInteger(node.layer)) {
+      errors.push(`Node ${index}: Invalid 'layer' value '${node.layer}'. Must be non-negative integer`);
+    }
+  });
+
+  // Validate edges reference existing nodes
+  if (spec.edges && Array.isArray(spec.edges)) {
+    const nodeIds = new Set(spec.nodes?.map((n: any) => n.id).filter(Boolean) || []);
+    spec.edges.forEach((edge: any, index: number) => {
+      if (!edge.from || typeof edge.from !== 'string' || !nodeIds.has(edge.from)) {
+        errors.push(`Edge ${index}: Invalid 'from' reference '${edge.from}' - node does not exist`);
+      }
+      if (!edge.to || typeof edge.to !== 'string' || !nodeIds.has(edge.to)) {
+        errors.push(`Edge ${index}: Invalid 'to' reference '${edge.to}' - node does not exist`);
+      }
+    });
+  }
+
+  return {
+    ...spec,
+    isValid: errors.length === 0,
+    errors
+  };
 }
 
 const NODE_W = 148;
@@ -28,6 +87,29 @@ const PAD = 24;
  */
 export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
   const [expanded, setExpanded] = useState(false);
+
+  // Validate the diagram spec before any processing to prevent crashes from AI-generated invalid JSON
+  const validatedSpec = validateDiagramSpec(spec);
+
+  if (!validatedSpec.isValid) {
+    return (
+      <div className="rounded-xl border border-flare-500/50 bg-flare-500/10 p-4 my-2 not-prose">
+        <p className="text-flare-400 text-sm font-medium">⚠️ Diagram Generation Error</p>
+        <p className="text-flare-300 text-xs mt-1">Invalid diagram structure detected. Visual information unavailable.</p>
+        {process.env.NODE_ENV === 'development' && validatedSpec.errors.length > 0 && (
+          <details className="mt-2">
+            <summary className="text-xs text-flare-400 cursor-pointer hover:text-flare-300">Debug: Validation Errors</summary>
+            <div className="mt-1 text-xs text-flare-300 font-mono bg-flare-900/20 p-2 rounded overflow-auto max-h-32">
+              {validatedSpec.errors.map((error, i) => (
+                <div key={i}>• {error}</div>
+              ))}
+            </div>
+          </details>
+        )}
+      </div>
+    );
+  }
+
   if (!spec || !Array.isArray(spec.nodes) || spec.nodes.length === 0) return null;
 
   const layers = new Map<number, DiagramSpec["nodes"]>();
@@ -62,6 +144,7 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
         const from = positions.get(e.from);
         const to = positions.get(e.to);
         if (!from || !to) return null;
+        // Point arrows to center of boxes with proper offset
         const x1 = from.x + NODE_W;
         const y1 = from.y + NODE_H / 2;
         const x2 = to.x;
