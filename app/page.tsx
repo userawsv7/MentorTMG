@@ -7,10 +7,12 @@ import PurposeBar from "@/components/PurposeBar";
 import Relay from "@/components/Relay";
 import ChatWindow from "@/components/ChatWindow";
 import KodeKeyAdvisor from "@/components/KodeKeyAdvisor";
+import SpiritualRouter from "@/components/SpiritualRouter";
 import { store } from "@/lib/store";
 import { AttemptLog, Attachment, ChatMessage, Mode, Purpose, SessionMeta } from "@/lib/types";
 import { hasImageGenModel } from "@/lib/providers";
 import { buildChain, issueTypeLabel } from "@/lib/router";
+import { generateContentBasedSessionName } from "@/lib/sessionNames";
 
 export default function Page() {
   const [ready, setReady] = useState(false);
@@ -290,6 +292,11 @@ export default function Page() {
         />
 
         <Relay attempts={attempts} />
+
+        {/* Spiritual Router Display - Shows during free key search and routing (GR009) */}
+        <SpiritualRouter
+          isSearching={loading && mode === "free"}
+        />
 
         {error && (
           <div className="mx-4 md:mx-8 mt-3 rounded-lg border border-flare-500/40 bg-flare-500/10 text-flare-500 text-sm px-3 py-2.5">
