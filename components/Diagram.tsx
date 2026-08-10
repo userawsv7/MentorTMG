@@ -1,11 +1,148 @@
 "use client";
 
+import React, { useState } from "react";
+
 /**
  * Small, dependency-free SVG diagrams used to visually explain how a flow
  * works (relay fallback, the KodeKey approval gate, API-test triage) instead
  * of relying purely on text. Kept intentionally simple: boxes + arrows +
  * a one-line caption per step, in the app's existing color tokens.
  */
+
+interface ZoomControlsProps {
+  zoom: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onReset: () => void;
+  onFit: () => void;
+}
+
+function ZoomControls({ zoom, onZoomIn, onZoomOut, onReset, onFit }: ZoomControlsProps) {
+  return (
+    <div className="absolute top-2 right-2 flex items-center gap-1 bg-base-950/90 rounded-lg border border-base-700 p-1">
+      <button
+        onClick={onZoomOut}
+        className="px-2 py-1 text-xs text-base-400 hover:text-base-200 hover:bg-base-800 rounded"
+        title="Zoom out"
+      >
+        −
+      </button>
+      <span className="px-2 py-1 text-xs text-base-400 tabular-nums min-w-[3ch] text-center">
+        {Math.round(zoom * 100)}%
+      </span>
+      <button
+        onClick={onZoomIn}
+        className="px-2 py-1 text-xs text-base-400 hover:text-base-200 hover:bg-base-800 rounded"
+        title="Zoom in"
+      >
+        +
+      </button>
+      <div className="w-px h-4 bg-base-700 mx-1" />
+      <button
+        onClick={onFit}
+        className="px-2 py-1 text-xs text-base-400 hover:text-base-200 hover:bg-base-800 rounded"
+        title="Fit to view"
+      >
+        Fit
+      </button>
+      <button
+        onClick={onReset}
+        className="px-2 py-1 text-xs text-base-400 hover:text-base-200 hover:bg-base-800 rounded"
+        title="Reset zoom"
+      >
+        Reset
+      </button>
+    </div>
+  );
+}
+
+interface ZoomableDiagramProps {
+  children: React.ReactNode;
+  viewBox: string;
+  className?: string;
+}
+
+function ZoomableDiagram({ children, viewBox, className = "" }: ZoomableDiagramProps) {
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const minZoom = 0.5;
+  const maxZoom = 3;
+
+  const handleZoomIn = () => {
+    setZoom(Math.min(maxZoom, zoom * 1.2));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(Math.max(minZoom, zoom / 1.2));
+  };
+
+  const handleReset = () => {
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
+  };
+
+  const handleFit = () => {
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - panX, y: e.clientY - panY });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoom > 1) {
+      setPanX(e.clientX - dragStart.x);
+      setPanY(e.clientY - dragStart.y);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const cursor = zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default';
+
+  return (
+    <div className={`relative ${className}`}>
+      <div
+        className="overflow-hidden rounded-lg"
+        style={{ cursor }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <svg
+          viewBox={viewBox}
+          className="w-full h-auto transition-transform duration-100"
+          style={{
+            transform: `scale(${zoom}) translate(${panX / zoom}px, ${panY / zoom}px)`,
+            transformOrigin: 'top left'
+          }}
+        >
+          {children}
+        </svg>
+      </div>
+      <ZoomControls
+        zoom={zoom}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onReset={handleReset}
+        onFit={handleFit}
+      />
+    </div>
+  );
+}
 
 export function Box({ x, y, w, h, label, tone = "base" }: { x: number; y: number; w: number; h: number; label: string; tone?: "base" | "signal" | "flare" | "amber" }) {
   const toneClasses: Record<string, string> = {
@@ -79,20 +216,20 @@ export function ArrowDefs() {
 export function RelayFlowDiagram() {
   return (
     <figure className="rounded-xl border border-base-700 bg-base-900/40 p-3">
-      <svg viewBox="0 0 560 130" className="w-full h-auto">
+      <ZoomableDiagram viewBox="0 0 720 160">
         <ArrowDefs />
-        <Box x={10} y={45} w={110} h={40} label="Your message" tone="base" />
-        <Arrow x1={120} y1={65} x2={158} y2={65} />
-        <Box x={160} y={20} w={130} h={40} label="Try top-ranked model" tone="signal" />
-        <Arrow x1={225} y1={60} x2={225} y2={78} />
-        <Box x={160} y={80} w={130} h={40} label="Fails? try next in chain" tone="amber" />
-        <Arrow x1={292} y1={40} x2={330} y2={40} />
-        <Box x={332} y={20} w={110} h={40} label="First success answers you" tone="signal" />
-        <Arrow x1={292} y1={100} x2={330} y2={100} />
-        <Box x={332} y={80} w={110} h={40} label="All fail → clear error + fixes" tone="flare" />
-        <Arrow x1={442} y1={40} x2={480} y2={40} />
-        <Box x={482} y={20} w={70} h={40} label="Reply shown" tone="base" />
-      </svg>
+        <Box x={20} y={55} w={130} h={50} label="Your message" tone="base" />
+        <Arrow x1={150} y1={80} x2={190} y2={80} />
+        <Box x={200} y={25} w={150} h={50} label="Try top-ranked model" tone="signal" />
+        <Arrow x1={275} y1={75} x2={275} y2={100} />
+        <Box x={200} y={105} w={150} h={50} label="Fails? try next in chain" tone="amber" />
+        <Arrow x1={350} y1={50} x2={390} y2={50} />
+        <Box x={400} y={25} w={150} h={50} label="First success answers you" tone="signal" />
+        <Arrow x1={350} y1={130} x2={390} y2={130} />
+        <Box x={400} y={105} w={150} h={50} label="All fail → clear error + fixes" tone="flare" />
+        <Arrow x1={550} y1={50} x2={590} y2={50} />
+        <Box x={600} y={25} w={100} h={50} label="Reply shown" tone="base" />
+      </ZoomableDiagram>
       <figcaption className="mt-2 text-xs text-base-500">
         Relay tries models in ranked order for your chosen purpose. The moment one succeeds, that's your answer — a
         failure just quietly hops to the next one in the chain instead of stopping the conversation.
@@ -104,16 +241,16 @@ export function RelayFlowDiagram() {
 export function KodeKeyApprovalDiagram() {
   return (
     <figure className="rounded-xl border border-base-700 bg-base-900/40 p-3">
-      <svg viewBox="0 0 560 130" className="w-full h-auto">
+      <ZoomableDiagram viewBox="0 0 720 160">
         <ArrowDefs />
-        <Box x={10} y={45} w={100} h={40} label="Your task" tone="base" />
-        <Arrow x1={110} y1={65} x2={148} y2={65} />
-        <Box x={150} y={45} w={130} h={40} label="Free-key advisor: rank + improve prompt" tone="signal" />
-        <Arrow x1={280} y1={65} x2={318} y2={65} />
-        <Box x={320} y={45} w={110} h={40} label="You review & pick" tone="amber" />
-        <Arrow x1={430} y1={65} x2={468} y2={65} />
-        <Box x={470} y={45} w={80} h={40} label="KodeKey runs" tone="flare" />
-      </svg>
+        <Box x={20} y={55} w={130} h={50} label="Your task" tone="base" />
+        <Arrow x1={150} y1={80} x2={190} y2={80} />
+        <Box x={200} y={55} w={170} h={50} label="Free-key advisor: rank + improve prompt" tone="signal" />
+        <Arrow x1={370} y1={80} x2={410} y2={80} />
+        <Box x={420} y={55} w={130} h={50} label="You review & pick" tone="amber" />
+        <Arrow x1={550} y1={80} x2={590} y2={80} />
+        <Box x={600} y={55} w={100} h={50} label="KodeKey runs" tone="flare" />
+      </ZoomableDiagram>
       <figcaption className="mt-2 text-xs text-base-500">
         Nothing reaches a KodeKey model automatically. A free key first ranks the best-fit KodeKey models and can
         tighten your prompt — you review that and manually approve one before it's ever called.
@@ -125,20 +262,20 @@ export function KodeKeyApprovalDiagram() {
 export function ApiTestFlowDiagram() {
   return (
     <figure className="rounded-xl border border-base-700 bg-base-900/40 p-3">
-      <svg viewBox="0 0 560 150" className="w-full h-auto">
+      <ZoomableDiagram viewBox="0 0 720 180">
         <ArrowDefs />
-        <Box x={10} y={55} w={100} h={40} label="Test this key" tone="base" />
-        <Arrow x1={110} y1={75} x2={148} y2={75} />
-        <Box x={150} y={55} w={110} h={40} label="Call provider" tone="signal" />
-        <Arrow x1={225} y1={94} x2={225} y2={112} />
-        <Box x={150} y={115} w={110} h={30} label="Failed" tone="flare" />
-        <Arrow x1={260} y1={75} x2={298} y2={75} />
-        <Box x={300} y={20} w={120} h={30} label="Working ✓" tone="signal" />
-        <Arrow x1={260} y1={130} x2={298} y2={130} />
-        <Box x={300} y={100} w={120} h={30} label="Issue type identified" tone="amber" />
-        <Arrow x1={420} y1={115} x2={458} y2={115} />
-        <Box x={460} y={100} w={90} h={30} label="Fix suggested" tone="flare" />
-      </svg>
+        <Box x={20} y={65} w={120} h={50} label="Test this key" tone="base" />
+        <Arrow x1={140} y1={90} x2={180} y2={90} />
+        <Box x={190} y={65} w={130} h={50} label="Call provider" tone="signal" />
+        <Arrow x1={255} y1={115} x2={255} y2={140} />
+        <Box x={180} y={145} w={150} h={30} label="Failed" tone="flare" />
+        <Arrow x1={320} y1={90} x2={360} y2={90} />
+        <Box x={370} y={20} w={150} h={40} label="Working ✓" tone="signal" />
+        <Arrow x1={255} y1={175} x2={255} y2={175} />
+        <Box x={370} y={125} w={150} h={40} label="Issue type identified" tone="amber" />
+        <Arrow x1={520} y1={145} x2={560} y2={145} />
+        <Box x={570} y={120} w={130} h={50} label="Fix suggested" tone="flare" />
+      </ZoomableDiagram>
       <figcaption className="mt-2 text-xs text-base-500">
         A failed test doesn't just say "not working" — it's sorted into a category (auth, wrong endpoint, rate limit,
         etc.) so the suggested fix actually matches what went wrong.
