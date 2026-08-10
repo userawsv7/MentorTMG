@@ -1,3 +1,5 @@
+import { generateRelevantSessionName } from './generalRules';
+
 const ADJECTIVES = [
   "Curious", "Quiet", "Bright", "Steady", "Swift", "Calm", "Bold", "Gentle",
   "Sharp", "Warm", "Clever", "Vivid", "Quick", "Patient", "Keen", "Sunny",
@@ -20,4 +22,26 @@ export function generateSessionName(existingNames: string[] = []): string {
     if (!used.has(name)) return name;
   }
   return `Session ${Math.floor(Math.random() * 9000 + 1000)}`;
+}
+
+/**
+ * Generate session name based on actual chat content and topics discussed.
+ * This follows General Rule GR005: Provide relevant session names as per chat session.
+ * @param topics - Array of topics discussed in the session
+ * @param purpose - Optional purpose context
+ * @param existingNames - Names already in use
+ */
+export function generateContentBasedSessionName(
+  topics: string[],
+  purpose?: string,
+  existingNames: string[] = []
+): string {
+  // Try content-based naming first
+  const contentBasedName = generateRelevantSessionName(topics, purpose);
+  if (!existingNames.includes(contentBasedName)) {
+    return contentBasedName;
+  }
+
+  // Fall back to original naming if conflict
+  return generateSessionName(existingNames);
 }
