@@ -8,9 +8,33 @@ type Tone = "base" | "signal" | "flare" | "amber";
 export interface DiagramSpec {
   title?: string;
   /** Free-form flow, architecture, comparison, or troubleshooting diagram. */
-  nodes: { id: string; label: string; tone?: Tone; layer?: number; description?: string }[];
-  edges?: { from: string; to: string; label?: string; description?: string }[];
+  nodes: {
+    id: string;
+    label: string;
+    tone?: Tone;
+    layer?: number;
+    description?: string;
+    // Learning enhancements
+    definition?: string;
+    beginnerTip?: string;
+    intermediateNote?: string;
+    expertInsight?: string;
+  }[];
+  edges?: {
+    from: string;
+    to: string;
+    label?: string;
+    description?: string;
+    // Learning enhancements
+    explanation?: string;
+  }[];
   caption?: string;
+  // Learning architecture metadata
+  learningContext?: {
+    topic: string;
+    level: "beginner" | "intermediate" | "expert";
+    prerequisites?: string[];
+  };
 }
 
 /**
@@ -177,16 +201,93 @@ export default function GeneratedDiagram({ spec }: { spec: DiagramSpec }) {
 
       {expanded && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-6"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-6 overflow-auto"
           onClick={() => setExpanded(false)}
         >
-          <div className="w-full max-w-4xl bg-base-900 border border-base-700 rounded-2xl shadow-glow p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-6xl bg-base-900 border border-base-700 rounded-2xl shadow-glow p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
               {spec.title && <p className="text-sm font-medium text-base-200">{spec.title}</p>}
               <button onClick={() => setExpanded(false)} className="ml-auto text-base-400 hover:text-signal-400 text-sm" aria-label="Close">
                 ✕
               </button>
             </div>
+
+            {/* Enhanced Learning View */}
+            <div className="mb-6">
+              {spec.learningContext && (
+                <div className="mb-4 p-3 bg-base-800/50 rounded-lg border border-base-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-medium text-signal-400">LEARNING CONTEXT</span>
+                    <span className="text-xs px-2 py-0.5 bg-signal-500/20 text-signal-400 rounded">
+                      {spec.learningContext.level}
+                    </span>
+                  </div>
+                  <p className="text-sm text-base-300">{spec.learningContext.topic}</p>
+                  {spec.learningContext.prerequisites && spec.learningContext.prerequisites.length > 0 && (
+                    <div className="mt-2">
+                      <span className="text-xs text-base-400">Prerequisites: </span>
+                      <span className="text-xs text-base-300">{spec.learningContext.prerequisites.join(", ")}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Node Learning Details */}
+              {spec.nodes.some(n => n.definition || n.beginnerTip || n.intermediateNote || n.expertInsight) && (
+                <div className="mb-4 space-y-3">
+                  <h4 className="text-sm font-medium text-base-300">Component Learning Guide</h4>
+                  {spec.nodes.map((node, idx) => (
+                    (node.definition || node.beginnerTip || node.intermediateNote || node.expertInsight) && (
+                      <details key={idx} className="bg-base-800/30 rounded-lg border border-base-700">
+                        <summary className="cursor-pointer p-3 text-sm text-base-200 hover:text-signal-400">
+                          {node.label}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-2 text-xs">
+                          {node.definition && (
+                            <div>
+                              <span className="text-amber-400">Definition: </span>
+                              <span className="text-base-300">{node.definition}</span>
+                            </div>
+                          )}
+                          {node.beginnerTip && (
+                            <div>
+                              <span className="text-signal-400">Beginner: </span>
+                              <span className="text-base-300">{node.beginnerTip}</span>
+                            </div>
+                          )}
+                          {node.intermediateNote && (
+                            <div>
+                              <span className="text-amber-400">Intermediate: </span>
+                              <span className="text-base-300">{node.intermediateNote}</span>
+                            </div>
+                          )}
+                          {node.expertInsight && (
+                            <div>
+                              <span className="text-flare-400">Expert: </span>
+                              <span className="text-base-300">{node.expertInsight}</span>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )
+                  ))}
+                </div>
+              )}
+
+              {/* Edge Explanations */}
+              {spec.edges?.some(e => e.explanation) && (
+                <div className="mb-4 space-y-2">
+                  <h4 className="text-sm font-medium text-base-300">Relationship Explanations</h4>
+                  {spec.edges.filter(e => e.explanation).map((edge, idx) => (
+                    <div key={idx} className="text-xs bg-base-800/30 p-2 rounded border border-base-700">
+                      <span className="text-signal-400">{edge.from} → {edge.to}: </span>
+                      <span className="text-base-300">{edge.explanation}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {svg}
             {spec.caption && <p className="mt-3 text-sm text-base-400">{spec.caption}</p>}
           </div>

@@ -17,9 +17,28 @@ CRITICAL JSON GENERATION RULES - THESE ARE MANDATORY:
 7. Every node MUST have exactly these four properties: id, label, tone, layer
 8. Every edge MUST have at least: from, to (label is optional but must be complete if present)
 
-VALID COMPLETE EXAMPLE - STUDY THIS FORMAT:
+ENHANCED LEARNING DIAGRAM FEATURES:
+For diagrams that serve as learning tools, enhance nodes and edges with educational content:
+
+NODE ENHANCEMENTS (add when educational value is high):
+- "definition": Clear definition of what this component/concept is
+- "beginnerTip": Simple explanation for beginners
+- "intermediateNote": How it works for intermediate users
+- "expertInsight": Architecture/trade-offs for experts
+
+EDGE ENHANCEMENTS:
+- "explanation": Why this relationship matters or how it works
+
+LEARNING CONTEXT (add at diagram root level):
+- "learningContext": {
+    "topic": "Brief description of what this diagram teaches",
+    "level": "beginner|intermediate|expert",
+    "prerequisites": ["array", "of", "prerequisite", "concepts"]
+  }
+
+VALID COMPLETE EXAMPLE WITH LEARNING ENHANCEMENTS:
 \`\`\`diagram
-{"title":"API Request Flow","nodes":[{"id":"client","label":"Client App","tone":"base","layer":0},{"id":"api","label":"REST API","tone":"signal","layer":1},{"id":"db","label":"Database","tone":"base","layer":2}],"edges":[{"from":"client","to":"api","label":"HTTP POST"},{"from":"api","to":"db","label":"Query"}],"caption":"Client sends request through API to database with success feedback"}
+{"title":"API Request Flow","learningContext":{"topic":"Understanding how web requests flow through a typical stack","level":"beginner","prerequisites":["HTTP basics","Client-server model"]},"nodes":[{"id":"client","label":"Client App","tone":"base","layer":0,"definition":"The application making requests, usually a web browser or mobile app","beginnerTip":"Think of this as your phone or computer asking for information","intermediateNote":"Handles user interface, manages request lifecycle, processes responses"},{"id":"api","label":"REST API","tone":"signal","layer":1,"definition":"Application Programming Interface that follows REST principles","beginnerTip":"A waiter that takes your order and brings back what you asked for","expertInsight":"Stateless, cacheable, uniform interface - enables scalability and loose coupling"},{"id":"db","label":"Database","tone":"base","layer":2,"definition":"Persistent storage system for application data","beginnerTip":"Where all the information is stored permanently","intermediateNote":"Provides ACID properties, handles concurrent access, maintains data integrity"}],"edges":[{"from":"client","to":"api","label":"HTTP POST","explanation":"Client sends structured request with method, headers, and optional body data"},{"from":"api","to":"db","label":"Query","explanation":"API translates HTTP request into database query language (SQL/NoSQL)"}],"caption":"Client sends request through API to database with success feedback"}
 \`\`\`
 
 COMMON FAILURES TO AVOID:
@@ -28,7 +47,7 @@ COMMON FAILURES TO AVOID:
 - Trailing commas: {"id":"a",}  <-- WRONG (syntax error)
 - Wrong tone values: "tone":"success"  <-- WRONG (must be exactly "signal")
 
-Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read.
+Rules: "layer" is the left-to-right column (0,1,2…) — put cause before effect. "tone" is one of base (neutral step), signal (success/fix/good state), flare (failure/problem/danger), amber (warning/decision point) — use tone to make the failure or fix visually jump out, not decoration. Keep it to 4-10 nodes and short labels; a diagram that's hard to scan in 3 seconds has failed its job. Always add a caption. Never use a diagram where a single sentence would already be instantly clear — reserve it for things that are genuinely easier to see than to read. When the diagram serves as a learning tool, enhance with definitions, tiered explanations, and relationship context.
 `.trim();
 
 export const TEACHING_STYLE = `
